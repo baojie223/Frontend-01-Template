@@ -1,17 +1,33 @@
-<div id="draggable" style="width: 100px; height: 100px; background-color: pink"></div>
+<div id="container">
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本 文本
+  文本 文本 文本 文本 文本 文本 文本 文本 文本
+</div>
+<div id="draggable" style="width: 100px; height: 100px; background-color: pink; display: inline-block;"></div>
 <script>
   const draggable = document.querySelector('#draggable')
 
-  let baseX = 0, baseY = 0
+  let baseX = 0,
+    baseY = 0
 
   draggable.addEventListener('mousedown', (e) => {
     const startX = e.clientX,
       startY = e.clientY
 
     const move = (event) => {
-      const x = baseX + event.clientX - startX,
-        y = baseY + event.clientY - startY
-      draggable.style.transform = `translate(${x}px, ${y}px)`
+      const range = nearest(event.clientX, event.clientY)
+      console.log(range)
+      range.insertNode(draggable)
+      // const x = baseX + event.clientX - startX,
+      //   y = baseY + event.clientY - startY
+      // draggable.style.transform = `translate(${x}px, ${y}px)`
     }
 
     const up = (event) => {
@@ -25,4 +41,31 @@
 
     document.addEventListener('mouseup', up)
   })
+
+  const container = document.querySelector('#container')
+
+  const ranges = []
+
+  for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
+    const range = document.createRange()
+    range.setStart(container.childNodes[0], i)
+    range.setEnd(container.childNodes[0], i)
+    ranges.push(range)
+  }
+
+  function nearest(x0, y0) {
+    let nearestRange = null
+    let distance = Infinity
+    for (let range of ranges) {
+      const { x, y } = range.getBoundingClientRect()
+      const d = (x - x0) ** 2 + (y - y0) ** 2
+      if (d < distance) {
+        nearestRange = range
+        distance = d
+      }
+    }
+    return nearestRange
+  }
+
+  document.addEventListener('selectstart', (e) => e.preventDefault())
 </script>

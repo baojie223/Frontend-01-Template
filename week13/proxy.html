@@ -1,0 +1,59 @@
+<div style="display: flex; flex-direction: column; width: 150px">
+  <div id="box" style="width: 100px; height: 100px"></div>
+  <input id="r" type="range" min="0" max="255" />
+  <input id="g" type="range" min="0" max="255" />
+  <input id="b" type="range" min="0" max="255" />
+</div>
+
+<script>
+  const handlers = new Map()
+  const usedReactivities = new Set()
+
+  function reactive(o) {
+    return new Proxy(o, {
+      get(o, p) {
+        usedReactivities.add([o, p])
+        return o[p]
+      },
+      set(o, p, v) {
+        if (handlers.get(o) && handlers.get(o).get(p)) for (let handler of handlers.get(o).get(p)) handler()
+        o[p] = v
+        return true
+      },
+    })
+  }
+
+  function effect(handler) {
+    usedReactivities.clear()
+    handler()
+    for (let [o, p] of usedReactivities.values()) {
+      if (!handlers.has(o)) handlers.set(o, new Map())
+
+      if (!handlers.get(o).has(p)) handlers.get(o).set(p, [])
+
+      handlers.get(o).get(p).push(handler)
+    }
+  }
+
+  const color = reactive({ r: 0, g: 100, b: 255 })
+
+  effect(() => {
+    document.querySelector('#box').style.backgroundColor = `rgb(${color.r}, ${color.g}, ${color.b})`
+  })
+
+  effect(() => {
+    document.querySelector('#r').value = color.r
+    document.querySelector('#g').value = color.g
+    document.querySelector('#b').value = color.b
+  })
+
+  document.querySelector('#r').addEventListener('input', (e) => {
+    color.r = e.target.valueAsNumber
+  })
+  document.querySelector('#g').addEventListener('input', (e) => {
+    color.g = e.target.valueAsNumber
+  })
+  document.querySelector('#b').addEventListener('input', (e) => {
+    color.b = e.target.valueAsNumber
+  })
+</script>
