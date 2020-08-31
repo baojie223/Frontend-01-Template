@@ -1,7 +1,7 @@
 function create(Cls, attributes, ...children) {
   let o
   if (typeof Cls === 'string') {
-    o = new Wrapper()
+    o = new Wrapper(Cls)
   } else {
     o = new Cls()
   }
@@ -9,15 +9,16 @@ function create(Cls, attributes, ...children) {
     o.setArrtibute(name, attributes[name])
   }
   for (let child of children) {
+    if (typeof child === 'string') child = new Text(child)
     o.appendChild(child)
   }
   return o
 }
 
 class Wrapper {
-  constructor(config) {
+  constructor(type) {
     this.children = []
-    this.root = document.createElement('div')
+    this.root = document.createElement(type)
   }
 
   setArrtibute(name, value) {
@@ -29,32 +30,61 @@ class Wrapper {
   }
 
   mountTo(parent) {
-    console.log(parent)
     parent.appendChild(this.root)
     for (let child of this.children) {
-      if (typeof child === 'string') {
-      }
       child.mountTo(this.root)
     }
   }
 }
 
-class Text {
-  constructor() {}
+class MyComponent {
+  constructor(config) {
+    this.children = []
+  }
+
+  setArrtibute(name, value) {
+    this.root.setAttribute(name, value)
+  }
+
+  appendChild(child) {
+    this.children.push(child)
+  }
+
+  render() {
+    return (
+      <article>
+        <header>header</header>
+        {this.slot}
+        <footer>footer</footer>
+      </article>
+    )
+  }
 
   mountTo(parent) {
-    console.log(parent)
+    this.slot = <div></div>
+    for (let child of this.children) {
+      this.slot.appendChild(child)
+    }
+    this.render().mountTo(parent)
+  }
+}
+
+class Text {
+  constructor(text) {
+    this.root = document.createTextNode(text)
+  }
+
+  mountTo(parent) {
     parent.appendChild(this.root)
   }
 }
 
-const a = (
-  <div id="id" class="class" style="width: 100px; height: 100px; background-color: pink">
-    <div id="c1"></div>
-    <div id="c2"></div>
-  </div>
+const component = (
+  <MyComponent>
+    <div>text</div>
+  </MyComponent>
 )
 
-console.log(a)
+component.mountTo(document.body)
 
-a.mountTo(document.body)
+console.log(component)
