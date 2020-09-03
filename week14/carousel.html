@@ -1,0 +1,79 @@
+<body>
+  <div id="container"></div>
+</body>
+
+<script>
+  class Carousel {
+    constructor() {
+      this.root = null
+      this.data = null
+    }
+    render() {
+      this.root = document.createElement('div')
+      this.root.classList.add('carousel')
+
+      for (let d of this.data) {
+        const element = document.createElement('img')
+        element.src = d
+        this.root.appendChild(element)
+      }
+
+      let position = 0
+
+      const nextPic = () => {
+        let nextPosition = (position + 1) % this.data.length
+
+        const current = this.root.childNodes[position]
+        const next = this.root.childNodes[nextPosition]
+
+        current.style.transition = 'ease 0s'
+        next.style.transition = 'ease 0s'
+
+        current.style.transform = `translateX(${-100 * position}%)`
+        next.style.transform = `translateX(${100 - 100 * nextPosition}%)`
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            current.style.transition = 'ease 0.5s'
+            next.style.transition = 'ease 0.5s'
+
+            current.style.transform = `translateX(${-100 - 100 * position}%)`
+            next.style.transform = `translateX(${-100 * nextPosition}%)`
+
+            position = nextPosition
+          })
+        })
+
+        setTimeout(nextPic, 3000)
+
+        this.root.addEventListener('mousedown', event => {
+          let startX = event.clientX, start
+        })
+      }
+      nextPic()
+    }
+  }
+
+  const carousel = new Carousel()
+
+  carousel.data = [
+    'https://static001.geekbang.org/resource/image/35/6c/3550416c6f92b85df5d484455124376c.jpg?x-oss-process=image/resize,m_fill,h_216,w_164',
+    'https://static001.geekbang.org/resource/image/c6/55/c6c30b623636e9b57e440e19133f4155.jpg?x-oss-process=image/resize,m_fill,h_216,w_164',
+    'https://static001.geekbang.org/resource/image/4b/40/4be8ef4879ec671be60fbb9ddc289c40.jpg?x-oss-process=image/resize,m_fill,h_216,w_164',
+  ]
+
+  carousel.render()
+
+  document.querySelector('#container').appendChild(carousel.root)
+</script>
+
+<style>
+  .carousel {
+    display: flex;
+    width: 164px;
+    height: 200px;
+    outline: 1px solid teal;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+</style>
