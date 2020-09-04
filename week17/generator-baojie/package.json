@@ -1,0 +1,19 @@
+{
+  "name": "generator-baojie",
+  "version": "1.0.0",
+  "description": "",
+  "files": [
+    "generators"
+  ],
+  "scripts": {
+    "test": "yo baojie"
+  },
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "yeoman-generator": "^4.12.0"
+  }
+}
